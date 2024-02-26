@@ -3,7 +3,7 @@ import React from "react";
 const Lorem = () => {
   return (
     <>
-      <p className="opacity-2">
+      <p className="opacity-0">
         Login Greivin es una prueba de Diseño Lorem ipsum dolor sit amet,
         consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore
         et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud

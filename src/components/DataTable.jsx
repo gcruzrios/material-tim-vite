@@ -1,13 +1,53 @@
-import React from 'react'
+import React, { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
+import Swal from "sweetalert2";
+import axios from "axios";
 
 const DataTable = () => {
+
+  const [empresas, setEmpresas] = useState([]);
+
+  const peticionGet = async () => {
+    //console.log("en petición get")
+    await axios.get("/api/empresa/obtenerempresas").then((response) => {
+      setEmpresas(response.data);
+      // console.log(empresas);
+    });
+  };
+
+  useEffect(() => {
+    //console.log("En el effect")
+    peticionGet();
+  }, []);
+
+  const eliminar_completo = async (id) => {
+    const respuesta = await axios.delete(`api/empresa/borrarempresa/${id}`);
+    peticionGet();
+  };
+  const eliminar = async (id) => {
+    Swal.fire({
+      title: "Está seguro de borrar el registro?",
+      showDenyButton: false,
+      showCancelButton: true,
+      confirmButtonText: "Borrar",
+      denyButtonText: `No borrar`,
+    }).then((result) => {
+      /* Read more about isConfirmed, isDenied below */
+      if (result.isConfirmed) {
+        eliminar_completo(id);
+        Swal.fire("Empresa borrada!", "", "success");
+      } else if (result.isDenied) {
+        Swal.fire("La empresa no ha sido borrado", "", "info");
+      }
+    });
+  };
   return (
     <div>
         <div className="card my-4">
                 <div className="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
                   <div className="bg-gradient-primary shadow-primary border-radius-lg pt-4 pb-3">
                     <h6 className="text-white text-capitalize ps-3">
-                      Authors table
+                      Empresas registradas
                     </h6>
                   </div>
                 </div>
@@ -16,23 +56,30 @@ const DataTable = () => {
                     <table className="table align-items-center mb-0">
                       <thead>
                         <tr>
+                          
                           <th className="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
-                            Author
+                            Nombre
                           </th>
                           <th className="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
-                            Function
+                            Teléfono
+                          </th>
+                          
+                          <th className="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
+                            País
                           </th>
                           <th className="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
-                            Status
+                            Sector
                           </th>
                           <th className="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
-                            Employed
+                            Acciones
                           </th>
+                         
                           <th className="text-secondary opacity-7"></th>
                         </tr>
                       </thead>
                       <tbody>
-                        <tr>
+                       {empresas.map((empresa) => (
+                        <tr key={empresa._id}>
                           <td>
                             <div className="d-flex px-2 py-1">
                               <div>
@@ -43,279 +90,47 @@ const DataTable = () => {
                                 />
                               </div>
                               <div className="d-flex flex-column justify-content-center">
-                                <h6 className="mb-0 text-sm">John Michael</h6>
+                                <h6 className="mb-0 text-sm">{empresa.nombre}</h6>
                                 <p className="text-xs text-secondary mb-0">
-                                  john@creative-tim.com
+                                  {empresa.email}
                                 </p>
                               </div>
                             </div>
                           </td>
                           <td>
                             <p className="text-xs font-weight-bold mb-0">
-                              Manager
+                              Teléfono
                             </p>
                             <p className="text-xs text-secondary mb-0">
-                              Organization
+                            {empresa.telefono}
                             </p>
                           </td>
                           <td className="align-middle text-center text-sm">
-                            <span className="badge badge-sm bg-gradient-success">
-                              Online
-                            </span>
+                          {empresa.pais}
                           </td>
                           <td className="align-middle text-center">
                             <span className="text-secondary text-xs font-weight-bold">
-                              23/04/18
+                            {empresa.sector}
                             </span>
                           </td>
                           <td className="align-middle">
-                            <a
-                              href="javascript:;"
-                              className="text-secondary font-weight-bold text-xs"
-                              data-toggle="tooltip"
-                              data-original-title="Edit user"
-                            >
-                              Edit
-                            </a>
+                          <Link
+                          to={`/editempresa/${empresa._id}`}
+                          className="btn btn-info"
+                        >
+                          Editar
+                        </Link>{" "}
+                        <button
+                          className="btn btn-danger"
+                          onClick={() => eliminar(empresa._id)}
+                        >
+                          {" "}
+                          Borrar
+                        </button>
                           </td>
                         </tr>
-                        <tr>
-                          <td>
-                            <div className="d-flex px-2 py-1">
-                              <div>
-                                <img
-                                  src="../assets/img/team-3.jpg"
-                                  className="avatar avatar-sm me-3 border-radius-lg"
-                                  alt="user2"
-                                />
-                              </div>
-                              <div className="d-flex flex-column justify-content-center">
-                                <h6 className="mb-0 text-sm">Alexa Liras</h6>
-                                <p className="text-xs text-secondary mb-0">
-                                  alexa@creative-tim.com
-                                </p>
-                              </div>
-                            </div>
-                          </td>
-                          <td>
-                            <p className="text-xs font-weight-bold mb-0">
-                              Programator
-                            </p>
-                            <p className="text-xs text-secondary mb-0">
-                              Developer
-                            </p>
-                          </td>
-                          <td className="align-middle text-center text-sm">
-                            <span className="badge badge-sm bg-gradient-secondary">
-                              Offline
-                            </span>
-                          </td>
-                          <td className="align-middle text-center">
-                            <span className="text-secondary text-xs font-weight-bold">
-                              11/01/19
-                            </span>
-                          </td>
-                          <td className="align-middle">
-                            <a
-                              href="javascript:;"
-                              className="text-secondary font-weight-bold text-xs"
-                              data-toggle="tooltip"
-                              data-original-title="Edit user"
-                            >
-                              Edit
-                            </a>
-                          </td>
-                        </tr>
-                        <tr>
-                          <td>
-                            <div className="d-flex px-2 py-1">
-                              <div>
-                                <img
-                                  src="../assets/img/team-4.jpg"
-                                  className="avatar avatar-sm me-3 border-radius-lg"
-                                  alt="user3"
-                                />
-                              </div>
-                              <div className="d-flex flex-column justify-content-center">
-                                <h6 className="mb-0 text-sm">
-                                  Laurent Perrier
-                                </h6>
-                                <p className="text-xs text-secondary mb-0">
-                                  laurent@creative-tim.com
-                                </p>
-                              </div>
-                            </div>
-                          </td>
-                          <td>
-                            <p className="text-xs font-weight-bold mb-0">
-                              Executive
-                            </p>
-                            <p className="text-xs text-secondary mb-0">
-                              Projects
-                            </p>
-                          </td>
-                          <td className="align-middle text-center text-sm">
-                            <span className="badge badge-sm bg-gradient-success">
-                              Online
-                            </span>
-                          </td>
-                          <td className="align-middle text-center">
-                            <span className="text-secondary text-xs font-weight-bold">
-                              19/09/17
-                            </span>
-                          </td>
-                          <td className="align-middle">
-                            <a
-                              href="javascript:;"
-                              className="text-secondary font-weight-bold text-xs"
-                              data-toggle="tooltip"
-                              data-original-title="Edit user"
-                            >
-                              Edit
-                            </a>
-                          </td>
-                        </tr>
-                        <tr>
-                          <td>
-                            <div className="d-flex px-2 py-1">
-                              <div>
-                                <img
-                                  src="../assets/img/team-3.jpg"
-                                  className="avatar avatar-sm me-3 border-radius-lg"
-                                  alt="user4"
-                                />
-                              </div>
-                              <div className="d-flex flex-column justify-content-center">
-                                <h6 className="mb-0 text-sm">Michael Levi</h6>
-                                <p className="text-xs text-secondary mb-0">
-                                  michael@creative-tim.com
-                                </p>
-                              </div>
-                            </div>
-                          </td>
-                          <td>
-                            <p className="text-xs font-weight-bold mb-0">
-                              Programator
-                            </p>
-                            <p className="text-xs text-secondary mb-0">
-                              Developer
-                            </p>
-                          </td>
-                          <td className="align-middle text-center text-sm">
-                            <span className="badge badge-sm bg-gradient-success">
-                              Online
-                            </span>
-                          </td>
-                          <td className="align-middle text-center">
-                            <span className="text-secondary text-xs font-weight-bold">
-                              24/12/08
-                            </span>
-                          </td>
-                          <td className="align-middle">
-                            <a
-                              href="javascript:;"
-                              className="text-secondary font-weight-bold text-xs"
-                              data-toggle="tooltip"
-                              data-original-title="Edit user"
-                            >
-                              Edit
-                            </a>
-                          </td>
-                        </tr>
-                        <tr>
-                          <td>
-                            <div className="d-flex px-2 py-1">
-                              <div>
-                                <img
-                                  src="../assets/img/team-2.jpg"
-                                  className="avatar avatar-sm me-3 border-radius-lg"
-                                  alt="user5"
-                                />
-                              </div>
-                              <div className="d-flex flex-column justify-content-center">
-                                <h6 className="mb-0 text-sm">Richard Gran</h6>
-                                <p className="text-xs text-secondary mb-0">
-                                  richard@creative-tim.com
-                                </p>
-                              </div>
-                            </div>
-                          </td>
-                          <td>
-                            <p className="text-xs font-weight-bold mb-0">
-                              Manager
-                            </p>
-                            <p className="text-xs text-secondary mb-0">
-                              Executive
-                            </p>
-                          </td>
-                          <td className="align-middle text-center text-sm">
-                            <span className="badge badge-sm bg-gradient-secondary">
-                              Offline
-                            </span>
-                          </td>
-                          <td className="align-middle text-center">
-                            <span className="text-secondary text-xs font-weight-bold">
-                              04/10/21
-                            </span>
-                          </td>
-                          <td className="align-middle">
-                            <a
-                              href="javascript:;"
-                              className="text-secondary font-weight-bold text-xs"
-                              data-toggle="tooltip"
-                              data-original-title="Edit user"
-                            >
-                              Edit
-                            </a>
-                          </td>
-                        </tr>
-                        <tr>
-                          <td>
-                            <div className="d-flex px-2 py-1">
-                              <div>
-                                <img
-                                  src="../assets/img/team-4.jpg"
-                                  className="avatar avatar-sm me-3 border-radius-lg"
-                                  alt="user6"
-                                />
-                              </div>
-                              <div className="d-flex flex-column justify-content-center">
-                                <h6 className="mb-0 text-sm">Miriam Eric</h6>
-                                <p className="text-xs text-secondary mb-0">
-                                  miriam@creative-tim.com
-                                </p>
-                              </div>
-                            </div>
-                          </td>
-                          <td>
-                            <p className="text-xs font-weight-bold mb-0">
-                              Programator
-                            </p>
-                            <p className="text-xs text-secondary mb-0">
-                              Developer
-                            </p>
-                          </td>
-                          <td className="align-middle text-center text-sm">
-                            <span className="badge badge-sm bg-gradient-secondary">
-                              Offline
-                            </span>
-                          </td>
-                          <td className="align-middle text-center">
-                            <span className="text-secondary text-xs font-weight-bold">
-                              14/09/20
-                            </span>
-                          </td>
-                          <td className="align-middle">
-                            <a
-                              href="javascript:;"
-                              className="text-secondary font-weight-bold text-xs"
-                              data-toggle="tooltip"
-                              data-original-title="Edit user"
-                            >
-                              Edit
-                            </a>
-                          </td>
-                        </tr>
+                          ))}
+                       
                       </tbody>
                     </table>
                   </div>
