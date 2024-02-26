@@ -12,7 +12,7 @@ const Index = () => {
        <div className="col-lg-2">
        <Sidebar />
        </div>
-       <div className="col-lg-10">
+       <div className="col-lg-9">
        
        <Content /> 
        </div>
